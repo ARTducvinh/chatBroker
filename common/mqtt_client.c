@@ -15,18 +15,18 @@ static int subscribe_to_topic(MQTTClient client, const char* topic);
 
 
 static int connect_to_broker(MQTTClient client, MQTTClient_connectOptions* conn_opts) {
-    printf("Connecting to broker at %s...\n", ADDRESS);
 
     if (MQTTClient_connect(client, conn_opts) != MQTTCLIENT_SUCCESS) {
         printf("Failed to connect to broker!\n");
         return -1;
     }
-
-    printf("Connected to broker at %s\n", ADDRESS);
     return 0;
 }
 
+<<<<<<< HEAD
 c
+=======
+>>>>>>> d047c2e (Cập nhật MQTT client và thêm main2.c)
 int init_mqtt_client(MQTTClient *client, const char* client_id, const char* topic) {
     MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
     if (MQTTClient_create(client, ADDRESS, client_id, MQTTCLIENT_PERSISTENCE_NONE, NULL) != MQTTCLIENT_SUCCESS) {
@@ -48,8 +48,6 @@ int init_mqtt_client(MQTTClient *client, const char* client_id, const char* topi
         MQTTClient_destroy(client);
         return -1;
     }
-
-    printf("Successfully initialized client and subscribed to topic: %s\n", topic);
     return 0;
 }
 
@@ -59,7 +57,6 @@ static int subscribe_to_topic(MQTTClient client, const char* topic) {
         printf("Failed to subscribe to topic %s!\n", topic);
         return -1;
     }
-    printf("Subscribed to topic %s\n", topic);
     return 0;
 }
 
@@ -72,7 +69,6 @@ void publish_message(MQTTClient client, const char* client_id, const char* topic
     pubmsg.qos = QOS;
     pubmsg.retained = 0;
 
-    printf("Publishing message from client %s to topic %s...\n", client_id, topic);
     int rc = MQTTClient_publishMessage(client, topic, &pubmsg, &token);
     if (rc != MQTTCLIENT_SUCCESS) {
         printf("Failed to publish message! Error code: %d\n", rc);
@@ -80,7 +76,6 @@ void publish_message(MQTTClient client, const char* client_id, const char* topic
     }
 
     MQTTClient_waitForCompletion(client, token, TIMEOUT);
-    printf("Message delivered! User ID: %d\n", message->user_id);
 }
 
 void disconnect_from_broker(MQTTClient client) {
@@ -95,14 +90,26 @@ void disconnect_from_broker(MQTTClient client) {
 int message_arrived(void *context, char *topicName, int topicLen, MQTTClient_message *message) {
     printf("📩 Message received on topic: %s\n", topicName);
 
+    if (message->payloadlen != sizeof(message_t)) {
+        printf("Invalid message size received!\n");
+        MQTTClient_freeMessage(&message);
+        MQTTClient_free(topicName);
+        return 0;
+    }
+
     message_t msg;
     memcpy(&msg, message->payload, sizeof(message_t));
 
+<<<<<<< HEAD
     printf("User ID: %d\n", msg.user_id);
     printf("Message: %s\n", msg.data.data1.message);
+=======
+    printf("User ID: %s\n", msg.data1.name);
+    printf("Message: %s\n", msg.data1.message);
+>>>>>>> d047c2e (Cập nhật MQTT client và thêm main2.c)
 
     MQTTClient_freeMessage(&message);
     MQTTClient_free(topicName);
 
-    return 1; 
+    return 1;
 }
