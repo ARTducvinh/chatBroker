@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "mqttclient.h": "c",
+        "string.h": "c",
+        "data_format.h": "c"
+    }
+}
