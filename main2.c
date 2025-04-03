@@ -5,9 +5,9 @@
 #include <unistd.h>
 #include "common/mqtt_client.h"
 
-#define CLIENT_ID    "client1"
-#define PUB_TOPIC    "test/topic1"
-#define SUB_TOPIC    "test/topic2"
+#define CLIENT_ID    "client2"
+#define PUB_TOPIC    "test/topic2"
+#define SUB_TOPIC    "test/topic1"
 
 MQTTClient client;
 pthread_mutex_t mqtt_mutex;
@@ -17,7 +17,7 @@ void *mqtt_receive_thread(void *arg) {
         pthread_mutex_lock(&mqtt_mutex);
         message_t message;
         if (subscribe_message(client, SUB_TOPIC, &message) == 0) {
-            printf("[Client1] Received: %s\n", message.data.data1.message);
+            printf("[Client2] Received: %s\n", message.data.data1.message);
         }
         pthread_mutex_unlock(&mqtt_mutex);
         sleep(1);
@@ -30,9 +30,9 @@ void *mqtt_publish_thread(void *arg) {
     while (1) {
         pthread_mutex_lock(&mqtt_mutex);
         message_t message;
-        snprintf((char *)message.data.data1.message, sizeof(message.data.data1.message), "Client1 says Hello %d", count++);
+        snprintf((char *)message.data.data1.message, sizeof(message.data.data1.message), "Client2 says Hi %d", count++);
         publish_message(client, CLIENT_ID, PUB_TOPIC, &message);
-        printf("[Client1] Sent: %s\n", message.data.data1.message);
+        printf("[Client2] Sent: %s\n", message.data.data1.message);
         pthread_mutex_unlock(&mqtt_mutex);
         sleep(2);
     }
